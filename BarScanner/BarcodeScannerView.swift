@@ -7,14 +7,16 @@
 
 import SwiftUI
 
-struct AlertItem{
+struct AlertItem:Identifiable{
+    let id = UUID()
     let title:String
     let message:String
     let dismissButton:Alert.Button
 }
 
 struct AlertContext{
-    static let invalideviceInput = AlertItem(title: "Invalid Device", message: "Sorry couldnt initialize camera", dismissButton: <#T##Alert.Button#>)
+    static let invalidDeviceInput = AlertItem(title: "Invalid Device", message: "Sorry couldnt initialize camera", dismissButton: .default(Text("Ok")))
+    static let invalidScannedValue = AlertItem(title: "Invalid Scan", message: "Sorry couldnt scan QR", dismissButton: .default(Text("Ok")))
 }
 
 struct BarcodeScannerView: View {
@@ -26,7 +28,7 @@ struct BarcodeScannerView: View {
     var body: some View {
         NavigationStack{
             VStack{
-                ScannerView(scannedCode: $scannedCode).frame(
+                ScannerView(scannedCode: $scannedCode, alertItem: $alertItem).frame(
                     maxWidth:.infinity,
                     maxHeight:300
                 )
@@ -46,9 +48,15 @@ struct BarcodeScannerView: View {
 //                }
             }
             .navigationTitle("Barcode Scanner")
-            .alert(isPresented: $isShowingAlert, content: {
-                Alert(title: Text("Test"), message: Text("This is a test"),dismissButton: .default(Text("Ok")))
-            })
+//            .alert(isPresented: $isShowingAlert, content: {
+//                Alert(title: Text("Test"), message: Text("This is a test"),dismissButton: .default(Text("Ok")))
+//            })
+            .alert(item: $alertItem){
+                alertItem in
+                Alert(title: Text(alertItem.title),
+                      message: Text(alertItem.message),
+                      dismissButton: alertItem.dismissButton)
+            }
             .padding()
             
         }
